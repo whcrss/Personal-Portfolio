@@ -741,11 +741,11 @@
         <div class="contact-form">
           <div class="form-field">
             <label>Your name</label>
-            <input type="text" id="cf-name" placeholder="Jane Smith">
+            <input type="text" id="cf-name" placeholder="username">
           </div>
           <div class="form-field">
             <label>Email address</label>
-            <input type="email" id="cf-email" placeholder="jane@company.com">
+            <input type="email" id="cf-email" placeholder="@gmail.com">
           </div>
           <div class="form-field">
             <label>Message</label>
@@ -759,10 +759,12 @@
 </section>
 
 <footer>
-  <p>Designed & built with care · <strong>Ivy Sabandija</strong> · 2025</p>
+  <p>Designed & built with care · <strong>Ivy Sabandija</strong> · 2020</p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
+  emailjs.init("XyxskFKCUSg0TqLTd");
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -771,27 +773,48 @@
       document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
     });
   });
-
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
   function handleSend() {
     const name = document.getElementById('cf-name').value.trim();
     const email = document.getElementById('cf-email').value.trim();
     const msg = document.getElementById('cf-msg').value.trim();
     if (!name || !email || !msg) { alert('Please fill in all fields.'); return; }
     const btn = document.querySelector('.btn-white');
-    btn.textContent = 'Message sent! ✓';
-    btn.style.background = '#d4edda';
-    btn.style.color = '#1a472a';
-    document.getElementById('cf-name').value = '';
-    document.getElementById('cf-email').value = '';
-    document.getElementById('cf-msg').value = '';
-    setTimeout(() => { btn.textContent = 'Send Message'; btn.style.background = ''; btn.style.color = ''; }, 3000);
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    emailjs.send("service_rvfmuw6", "template_kkz7iuu", {
+      from_name: name,
+      from_email: email,
+      message: msg,
+    })
+    .then(() => {
+      btn.textContent = 'Message sent! ✓';
+      btn.style.background = '#d4edda';
+      btn.style.color = '#1a472a';
+      btn.disabled = false;
+      document.getElementById('cf-name').value = '';
+      document.getElementById('cf-email').value = '';
+      document.getElementById('cf-msg').value = '';
+      setTimeout(() => {
+        btn.textContent = 'Send Message';
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 3000);
+    })
+    .catch((error) => {
+      alert('Failed to send email. Please try again.');
+      btn.textContent = 'Send Message';
+      btn.disabled = false;
+      console.error('EmailJS error:', error);
+    });
+    const phoneNumber = "639926491997";
+    const text = `Hello! My name is ${name}%0AEmail: ${email}%0AMessage: ${msg}`;
+    const url = `https://wa.me/${phoneNumber}?text=${text}`;
+    window.open(url, '_blank');
   }
 </script>
-
 </body>
 </html>
